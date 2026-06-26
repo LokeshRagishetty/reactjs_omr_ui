@@ -8,8 +8,14 @@ const api = {
   openDirectory: () => ipcRenderer.invoke('dialog:openDirectory'),
   getSubFolders: (dirPath: string) => ipcRenderer.invoke('fs:getSubFolders', dirPath),
   getPageCount: (filePath: string) => ipcRenderer.invoke('pdf:getPageCount', filePath),
-  saveImages: (args: any) => ipcRenderer.invoke('pdf:saveImages', args),
-  runCommand: (args: any) => ipcRenderer.invoke('python:runCommand', args),
+  saveImages: (args: {
+    inputDir: string
+    outputDir: string
+    templatePath: string
+    images: string[]
+  }) => ipcRenderer.invoke('pdf:saveImages', args),
+  runCommand: (args: { command: string; inputDir: string; outputDir: string }) =>
+    ipcRenderer.invoke('python:runCommand', args),
   readOutput: (outputDir: string) => ipcRenderer.invoke('csv:readOutput', outputDir)
 }
 

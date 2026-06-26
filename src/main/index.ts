@@ -23,6 +23,13 @@ function createWindow(): void {
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
+    if (
+      details.url.includes('firebaseapp.com') ||
+      details.url.includes('accounts.google.com') ||
+      details.url.includes('googleapis.com')
+    ) {
+      return { action: 'allow' }
+    }
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
@@ -42,6 +49,9 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  // Spoof user agent to bypass Google Auth "disallowed_useragent" error
+  app.userAgentFallback = app.userAgentFallback.replace(/Electron\/\S+\s/, '')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

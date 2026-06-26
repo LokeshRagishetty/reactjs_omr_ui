@@ -8,7 +8,7 @@ import { parse } from 'csv-parse/sync'
 
 const execPromise = promisify(exec)
 
-export function registerIpcHandlers() {
+export function registerIpcHandlers(): void {
   ipcMain.handle('dialog:openDirectory', async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       properties: ['openDirectory']
@@ -20,7 +20,7 @@ export function registerIpcHandlers() {
   ipcMain.handle('fs:getSubFolders', async (_, dirPath: string) => {
     try {
       const entries = await fs.readdir(dirPath, { withFileTypes: true })
-      return entries.filter(e => e.isDirectory()).map(e => e.name)
+      return entries.filter((e) => e.isDirectory()).map((e) => e.name)
     } catch (e) {
       console.error(e)
       return []
@@ -48,7 +48,7 @@ export function registerIpcHandlers() {
       for (let i = 0; i < images.length; i++) {
         const imagePath = path.join(inputDir, `page_${i + 1}.png`)
         // remove base64 header
-        const base64Data = images[i].replace(/^data:image\/png;base64,/, "")
+        const base64Data = images[i].replace(/^data:image\/png;base64,/, '')
         await fs.writeFile(imagePath, base64Data, 'base64')
       }
 
@@ -56,9 +56,9 @@ export function registerIpcHandlers() {
       await copyDir(templatePath, inputDir)
 
       return { success: true }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e)
-      return { success: false, error: e.message }
+      return { success: false, error: e instanceof Error ? e.message : String(e) }
     }
   })
 
@@ -72,40 +72,40 @@ export function registerIpcHandlers() {
 
       const { stdout, stderr } = await execPromise(finalCommand)
       return { success: true, stdout, stderr }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e)
-      return { success: false, error: e.message }
+      return { success: false, error: e instanceof Error ? e.message : String(e) }
     }
   })
 
   ipcMain.handle('csv:readOutput', async (_, outputDir: string) => {
     try {
       const files = await fs.readdir(outputDir)
-      const csvFile = files.find(f => f.endsWith('.csv'))
+      const csvFile = files.find((f) => f.endsWith('.csv'))
       if (!csvFile) throw new Error('No CSV file found in output directory')
 
       const csvContent = await fs.readFile(path.join(outputDir, csvFile), 'utf-8')
       const records = parse(csvContent, { columns: true, skip_empty_lines: true })
       return { success: true, data: records }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error(e)
-      return { success: false, error: e.message }
+      return { success: false, error: e instanceof Error ? e.message : String(e) }
     }
   })
 }
 
 // Helpers
-async function cleanDirectory(dir: string) {
+async function cleanDirectory(dir: string): Promise<void> {
   try {
     await fs.rm(dir, { recursive: true, force: true })
     await fs.mkdir(dir, { recursive: true })
-  } catch (e) {
+  } catch {
     // maybe dir didn't exist
     await fs.mkdir(dir, { recursive: true }).catch(() => {})
   }
 }
 
-async function copyDir(src: string, dest: string) {
+async function copyDir(src: string, dest: string): Promise<void> {
   try {
     const entries = await fs.readdir(src, { withFileTypes: true })
     for (const entry of entries) {
@@ -118,7 +118,7 @@ async function copyDir(src: string, dest: string) {
         await fs.copyFile(srcPath, destPath)
       }
     }
-  } catch (e) {
-    console.error('Error copying template', e)
+  } catch (err) {
+    console.error('Error copying template', err)
   }
 }

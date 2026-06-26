@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { useEffect } from 'react'
+import { useEffect, JSX } from 'react'
 
-export function Login() {
+export function Login(): JSX.Element {
   const { login, user } = useAuth()
   const navigate = useNavigate()
 
@@ -21,7 +21,16 @@ export function Login() {
           <p className="text-gray-500 text-sm mt-1">Sign in to manage your PDF tests</p>
         </div>
         <div className="mt-8">
-          <button onClick={login} className="w-full bg-blue-600 text-white hover:bg-blue-700 px-4 py-3 rounded-lg font-medium transition flex items-center justify-center gap-2">
+          <button
+            onClick={async () => {
+              try {
+                await login()
+              } catch (e: unknown) {
+                alert('Login error: ' + (e instanceof Error ? e.message : String(e)))
+              }
+            }}
+            className="w-full bg-blue-600 text-white hover:bg-blue-700 px-4 py-3 rounded-lg font-medium transition flex items-center justify-center gap-2"
+          >
             Sign in with Google
           </button>
         </div>

@@ -1,15 +1,31 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
-import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, addDoc, query, where, orderBy, serverTimestamp } from 'firebase/firestore'
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  serverTimestamp
+} from 'firebase/firestore'
+
+import { SettingsData, TestData } from '../types'
 
 // Use placeholder or environment variables
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSy_YOUR_API_KEY",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "your-project.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "your-project",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "your-project.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_SENDER_ID || "1234567890",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:1234567890:web:abcdef123456"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSy_YOUR_API_KEY',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'your-project.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'your-project',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'your-project.appspot.com',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_SENDER_ID || '1234567890',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:1234567890:web:abcdef123456'
 }
 
 const app = initializeApp(firebaseConfig)
@@ -20,20 +36,27 @@ export const googleProvider = new GoogleAuthProvider()
 // Setup settings schema methods
 const SETTINGS_COLLECTION = 'settings'
 
-export async function getSettings(userId: string) {
+export async function getSettings(userId: string): Promise<SettingsData | null> {
   const snap = await getDoc(doc(db, SETTINGS_COLLECTION, userId))
-  if (snap.exists()) return snap.data()
+  if (snap.exists()) return snap.data() as SettingsData
   return null
 }
 
-export async function saveSettings(userId: string, data: any) {
-  await setDoc(doc(db, SETTINGS_COLLECTION, userId), { ...data, updatedAt: serverTimestamp() }, { merge: true })
+export async function saveSettings(userId: string, data: SettingsData): Promise<void> {
+  await setDoc(
+    doc(db, SETTINGS_COLLECTION, userId),
+    { ...data, updatedAt: serverTimestamp() },
+    { merge: true }
+  )
 }
 
 // Setup Tests schema methods
 const TESTS_COLLECTION = 'tests'
 
-export async function createTest(userId: string, data: any) {
+export async function createTest(
+  userId: string,
+  data: Omit<TestData, 'userId' | 'status' | 'pdfPages' | 'csvData'>
+): Promise<string> {
   const ref = await addDoc(collection(db, TESTS_COLLECTION), {
     ...data,
     userId,
@@ -46,22 +69,26 @@ export async function createTest(userId: string, data: any) {
   return ref.id
 }
 
-export async function getTests(userId: string) {
-  const q = query(collection(db, TESTS_COLLECTION), where('userId', '==', userId), orderBy('createdAt', 'desc'))
+export async function getTests(userId: string): Promise<TestData[]> {
+  const q = query(
+    collection(db, TESTS_COLLECTION),
+    where('userId', '==', userId),
+    orderBy('createdAt', 'desc')
+  )
   const snap = await getDocs(q)
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as TestData)
 }
 
-export async function getTest(id: string) {
+export async function getTest(id: string): Promise<TestData | null> {
   const snap = await getDoc(doc(db, TESTS_COLLECTION, id))
-  if (snap.exists()) return { id: snap.id, ...snap.data() }
+  if (snap.exists()) return { id: snap.id, ...snap.data() } as TestData
   return null
 }
 
-export async function updateTest(id: string, data: any) {
+export async function updateTest(id: string, data: Partial<TestData>): Promise<void> {
   await updateDoc(doc(db, TESTS_COLLECTION, id), { ...data, updatedAt: serverTimestamp() })
 }
 
-export async function deleteTest(id: string) {
+export async function deleteTest(id: string): Promise<void> {
   await deleteDoc(doc(db, TESTS_COLLECTION, id))
 }

@@ -6,6 +6,12 @@ export default defineConfig({
   main: {},
   preload: {},
   renderer: {
+    server: {
+      headers: {
+        'Cross-Origin-Opener-Policy': 'unsafe-none',
+        'Cross-Origin-Embedder-Policy': 'unsafe-none'
+      }
+    },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src')
