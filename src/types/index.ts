@@ -1,11 +1,10 @@
-import { FieldValue } from 'firebase/firestore'
-
 export interface SettingsData {
   inputDir: string
   outputDir: string
   templatesDir: string
   pythonCommand: string
-  updatedAt?: FieldValue | string | Date
+  templateNames?: string[]
+  updatedAt?: string | Date
 }
 
 export interface TestData {
@@ -20,6 +19,6 @@ export interface TestData {
   status: 'draft' | 'completed'
   pdfPages: number
   csvData: Record<string, string | number>[] | null
-  createdAt?: FieldValue | string | Date
-  updatedAt?: FieldValue | string | Date
+  createdAt?: string | Date
+  updatedAt?: string | Date
 }

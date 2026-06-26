@@ -1,5 +1,5 @@
 import { JSX } from 'react'
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { ToastProvider } from './contexts/ToastContext'
 import { Login } from './pages/Login'
@@ -17,7 +17,7 @@ function App(): JSX.Element {
   return (
     <ToastProvider>
       <AuthProvider>
-        <HashRouter>
+        <BrowserRouter>
           <div className="min-h-screen bg-gray-50 text-gray-900">
             <Routes>
               <Route path="/login" element={<Login />} />
@@ -47,7 +47,7 @@ function App(): JSX.Element {
               />
             </Routes>
           </div>
-        </HashRouter>
+        </BrowserRouter>
       </AuthProvider>
     </ToastProvider>
   )

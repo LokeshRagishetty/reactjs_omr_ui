@@ -6,13 +6,12 @@ import { getTests, createTest, deleteTest, getSettings } from '../lib/firebase'
 import { SettingsData, TestData } from '../types'
 
 export function Dashboard(): JSX.Element {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const { addToast } = useToast()
   const navigate = useNavigate()
   const [tests, setTests] = useState<TestData[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [showModal, setShowModal] = useState<boolean>(false)
-  const [templates, setTemplates] = useState<string[]>([])
   const [settings, setSettings] = useState<SettingsData | null>(null)
 
   // Form state
@@ -29,10 +28,6 @@ export function Dashboard(): JSX.Element {
       ])
       setTests(testsData)
       setSettings(settingsData)
-      if (settingsData?.templatesDir) {
-        const folders = await window.api.getSubFolders(settingsData.templatesDir)
-        setTemplates(folders)
-      }
     } catch (err) {
       console.error(err)
       addToast('Failed to load data', 'error')
@@ -72,7 +67,7 @@ export function Dashboard(): JSX.Element {
   async function handleDelete(id: string): Promise<void> {
     if (!confirm('Delete this test?')) return
     try {
-      await deleteTest(id)
+      await deleteTest(user!.uid, id)
       setTests(tests.filter((t) => t.id !== id))
       addToast('Test deleted', 'success')
     } catch (err) {
@@ -81,7 +76,10 @@ export function Dashboard(): JSX.Element {
     }
   }
 
-  if (loading) return <div>Loading...</div>
+  const templateNames = settings?.templateNames || []
+
+  if (loading)
+    return <div className="flex items-center justify-center py-20 text-gray-500">Loading...</div>
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -99,6 +97,12 @@ export function Dashboard(): JSX.Element {
             className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
           >
             New Test
+          </button>
+          <button
+            onClick={logout}
+            className="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200"
+          >
+            Sign Out
           </button>
         </div>
       </div>
@@ -184,12 +188,21 @@ export function Dashboard(): JSX.Element {
                   onChange={(e) => setFormTemplate(e.target.value)}
                 >
                   <option value="">Select a template</option>
-                  {templates.map((t) => (
+                  {templateNames.map((t) => (
                     <option key={t} value={t}>
                       {t}
                     </option>
                   ))}
                 </select>
+                {templateNames.length === 0 && (
+                  <p className="text-xs text-amber-600 mt-1">
+                    No templates configured.{' '}
+                    <Link to="/settings" className="underline">
+                      Add them in Settings
+                    </Link>
+                    .
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex gap-3 mt-6">
