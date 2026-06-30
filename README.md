@@ -161,7 +161,12 @@ Open the test you just created and click **Select PDF File** to upload your scan
 ### 4. Run the Generated Python Command
 Once the PDF is converted, the app will generate a custom Python command with your specific folder paths. Copy this command and run it in your terminal.
 ![Run Python Command](docs/step3-command.png)
-> **Note:** If the Python script pauses to show images of its edge detection, make sure to click on the image window and press **Q** on your keyboard to let the script finish processing!
+
+> **Note:** The Python script might pause to show debug images of its edge detection and grid alignment. When this happens, click on each image window and press the **Q** key on your keyboard to continue processing!
+
+![Debug Edge Detection](docs/step3-debug-edge.png)
+![Debug Markers 1](docs/step3-debug-dots1.png)
+![Debug Markers 2](docs/step3-debug-dots2.png)
 
 ### 5. View Results
 After the script finishes successfully in the terminal, click **Read Results from Output Folder** in the web app to view the generated CSV data.
