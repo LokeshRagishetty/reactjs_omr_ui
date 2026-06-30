@@ -108,7 +108,7 @@ Serve the `dist` (or `build`) folder with your preferred static server.
 ### 2. Configure Settings (first time)
 - Go to **Settings** (⚙️).
 - Select your **Input**, **Output**, and **Templates** folders using the browser’s folder picker.
-- Set your Python command (e.g., `python3 main.py --inputDir {input} --outputDir {output}`).
+- Set your Python command (e.g., `python3 main.py --inputDir [--inputDir] --outputDir [--outputDir]`).
 - Save settings.
 
 > The templates folder should contain sub‑folders, each representing a template.
@@ -138,6 +138,34 @@ Serve the `dist` (or `build`) folder with your preferred static server.
 ### 7. Manage Tests
 - Use the Dashboard to view, open, or delete existing tests.
 - Reset a test to draft state at any time.
+
+---
+
+## 🧪 Step-by-Step Testing Guide
+
+Follow this visual guide to test the end-to-end PDF processing workflow.
+
+### 1. Configure App Settings
+Go to the Settings page and select your local directories. Ensure your Python command uses the exact placeholders (`[--inputDir]` and `[--outputDir]`) as shown below:
+![Settings Configuration](docs/settings.png)
+
+### 2. Create a New Test
+Go to the Dashboard and click **New Test**. Fill in the details and choose a template (e.g., `sample1`).
+![Create New Test](docs/step1-create-test.png)
+
+### 3. Upload the PDF
+Open the test you just created and click **Select PDF File** to upload your scanned OMR sheets.
+*(A sample PDF is available in this repository at `docs/sample_omr.pdf` for testing purposes).*
+![Upload PDF](docs/step2-upload.png)
+
+### 4. Run the Generated Python Command
+Once the PDF is converted, the app will generate a custom Python command with your specific folder paths. Copy this command and run it in your terminal.
+![Run Python Command](docs/step3-command.png)
+> **Note:** If the Python script pauses to show images of its edge detection, make sure to click on the image window and press **Q** on your keyboard to let the script finish processing!
+
+### 5. View Results
+After the script finishes successfully in the terminal, click **Read Results from Output Folder** in the web app to view the generated CSV data.
+![View Results](docs/step4-results.png)
 
 ---
 
@@ -178,7 +206,7 @@ In the **Settings** page, you can define a Python command. Use `--inputDir` and 
 
 Example:
 ```
-python3 main.py --inputDir input_folder --outputDir output_folder
+python3 main.py --inputDir [--inputDir] --outputDir [--outputDir]
 ```
 
 ### Templates
